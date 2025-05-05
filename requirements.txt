@@ -1,3 +1,2 @@
-web3
-requests
+web3==6.15.1
 python-telegram-bot==13.15
