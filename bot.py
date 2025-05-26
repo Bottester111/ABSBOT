@@ -8,18 +8,18 @@ from telegram import Bot
 # Logging setup
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
 
-# Environment Variables
+# Env vars
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 RPC_URL = os.getenv("INFURA_URL")
-FACTORY_ADDRESS = "0x59fC79d625380f803a1fc5028Fc3Dc7c8B3c3f1E"  # Proper checksum
+FACTORY_RAW = "0x59fc79d625380f803a1fc5028fc3dc7c8b3c3f1e"  # lowercase, will be checksummed
 POLL_INTERVAL = 3
 
-# Debug output
+# Output for debug
 print(f"🔑 TELEGRAM_BOT_TOKEN: {TELEGRAM_BOT_TOKEN}")
 print(f"📨 TELEGRAM_CHAT_ID: {TELEGRAM_CHAT_ID}")
 print(f"🔗 RPC_URL: {RPC_URL}")
-print(f"🏭 FACTORY_ADDRESS: {FACTORY_ADDRESS}")
+print(f"🏭 FACTORY_ADDRESS: {FACTORY_RAW}")
 
 if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID or not RPC_URL:
     print("❌ Missing one or more required environment variables.")
@@ -27,6 +27,9 @@ if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID or not RPC_URL:
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
+
+# Apply checksum safely
+FACTORY_ADDRESS = Web3.to_checksum_address(FACTORY_RAW)
 
 factory = w3.eth.contract(address=FACTORY_ADDRESS, abi=[{
     "anonymous": False,
