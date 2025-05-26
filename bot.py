@@ -5,24 +5,23 @@ import logging
 from web3 import Web3
 from telegram import Bot
 
-# --- Logging setup ---
+# Logging setup
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
 
-# --- Environment Variables ---
+# Environment Variables
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 RPC_URL = os.getenv("INFURA_URL")
-FACTORY_ADDRESS = os.getenv("MOONSHOT_CONTRACT_ADDRESS")
-POLL_INTERVAL = 3  # seconds
+FACTORY_ADDRESS = "0x59Fc79D625380F803A1FC5028FC3Dc7c8B3c3f1e"  # Correct address hardcoded
+POLL_INTERVAL = 3
 
-# --- Debug prints for verification ---
+# Print config for debugging
 print(f"🔑 TELEGRAM_BOT_TOKEN: {TELEGRAM_BOT_TOKEN}")
 print(f"📨 TELEGRAM_CHAT_ID: {TELEGRAM_CHAT_ID}")
 print(f"🔗 RPC_URL: {RPC_URL}")
 print(f"🏭 FACTORY_ADDRESS: {FACTORY_ADDRESS}")
 
-# --- Validate environment setup ---
-if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID or not RPC_URL or not FACTORY_ADDRESS:
+if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID or not RPC_URL:
     print("❌ Missing one or more required environment variables.")
     exit(1)
 
@@ -62,7 +61,6 @@ def handle_new_pair(token0, token1, pair):
     sym1 = get_token_symbol(token1)
     message = f"🆕 New Pair Detected:\n\n{sym0} / {sym1}\nPair: {pair}"
     logging.info(f"Sending alert: {message}")
-
     try:
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     except Exception as e:
@@ -76,17 +74,14 @@ def main():
             current_block = w3.eth.block_number
             events = factory.events.PairCreated().get_logs(fromBlock=last_block + 1, toBlock=current_block)
             logging.info(f"Scanning blocks {last_block + 1} to {current_block}... found {len(events)} events.")
-
             for event in events:
                 pair = event["args"]["pair"]
                 if pair not in seen_pairs:
                     seen_pairs.add(pair)
                     handle_new_pair(event["args"]["token0"], event["args"]["token1"], pair)
-
             last_block = current_block
         except Exception as e:
-            logging.error(f"Error during event polling: {e}")
-
+            logging.error(f"Error during polling: {e}")
         time.sleep(POLL_INTERVAL)
 
 if __name__ == "__main__":
