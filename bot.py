@@ -12,10 +12,10 @@ logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(m
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 RPC_URL = os.getenv("INFURA_URL")
-FACTORY_ADDRESS = "0x59Fc79D625380F803A1FC5028FC3Dc7c8B3c3f1e"  # Correct address hardcoded
+FACTORY_ADDRESS = "0x59fC79d625380f803a1fc5028Fc3Dc7c8B3c3f1E"  # Proper checksum
 POLL_INTERVAL = 3
 
-# Print config for debugging
+# Debug output
 print(f"🔑 TELEGRAM_BOT_TOKEN: {TELEGRAM_BOT_TOKEN}")
 print(f"📨 TELEGRAM_CHAT_ID: {TELEGRAM_CHAT_ID}")
 print(f"🔗 RPC_URL: {RPC_URL}")
