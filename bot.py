@@ -106,7 +106,7 @@ def monitor_new_moonshot_tokens():
                     receipt = w3.eth.get_transaction_receipt(tx['hash'])
                     for log in receipt['logs']:
                         if log['address'].lower() == FACTORY_ADDRESS.lower() and log['topics'][0].hex() == "0x9b7f29228c2bdf9201f5a9ef2e3f3e976a30d9bd1720f7d0d63b472dcc675310":
-                            token_addr = '0x' + log['data'][26:66]
+                            token_addr = '0x' + log['data'].hex()[26:66]
                             print(f"🚀 New Moonshot token: {token_addr} from TX {tx['hash'].hex()}")
                             bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f"🚀 New Moonshot Token Detected: {token_addr}")
         LAST_BLOCK = latest
