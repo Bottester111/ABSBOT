@@ -108,8 +108,14 @@ def monitor_new_moonshot_tokens():
                     for log in receipt['logs']:
                         if log['address'].lower() == FACTORY_ADDRESS.lower() and log['topics'][0].hex() == "0x9b7f29228c2bdf9201f5a9ef2e3f3e976a30d9bd1720f7d0d63b472dcc675310":
                             token_addr = '0x' + log['data'].hex()[26:66]
+        try:
+            token_contract = w3.eth.contract(address=token_addr, abi=[{"constant":True,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":False,"stateMutability":"view","type":"function"}])
+            token_symbol = token_contract.functions.symbol().call()
+        except:
+            token_symbol = "???"
+
                             print(f"🚀 New Moonshot token: {token_addr} from TX {tx['hash'].hex()}")
-                            bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f"🚀 New Moonshot Token Detected: {token_addr}")
+                            bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f"""\n🚀 New token found!\n• Ticker: {token_symbol}\n• CA: {token_addr}\n• 🔗 DS: https://dexscreener.com/abstract/{token_addr}\n✅ Buy on Looter → @looter_ai_bot {token_addr}""")
         LAST_BLOCK = latest
         time.sleep(POLL_INTERVAL)
 
