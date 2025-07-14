@@ -87,5 +87,32 @@ def main():
             logging.error(f"Error during polling: {e}")
         time.sleep(POLL_INTERVAL)
 
+
+from web3.middleware import geth_poa_middleware
+
+w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+LAST_BLOCK = w3.eth.block_number
+
+def monitor_new_moonshot_tokens():
+    global LAST_BLOCK
+    print("👀 Watching for NewMoonshotTokenAndBuy events...")
+    while True:
+        latest = w3.eth.block_number
+        for block in range(LAST_BLOCK + 1, latest + 1):
+            block_data = w3.eth.get_block(block, full_transactions=True)
+            for tx in block_data['transactions']:
+                if tx['to'] and tx['to'].lower() == FACTORY_ADDRESS.lower():
+                    receipt = w3.eth.get_transaction_receipt(tx['hash'])
+                    for log in receipt['logs']:
+                        if log['address'].lower() == FACTORY_ADDRESS.lower() and log['topics'][0].hex() == "0x9b7f29228c2bdf9201f5a9ef2e3f3e976a30d9bd1720f7d0d63b472dcc675310":
+                            token_addr = '0x' + log['data'][26:66]
+                            print(f"🚀 New Moonshot token: {token_addr} from TX {tx['hash'].hex()}")
+                            bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f"🚀 New Moonshot Token Detected: {token_addr}")
+        LAST_BLOCK = latest
+        time.sleep(POLL_INTERVAL)
+
 if __name__ == "__main__":
-    main()
+    
+    monitor_new_moonshot_tokens()
+main()
