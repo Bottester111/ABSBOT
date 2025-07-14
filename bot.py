@@ -2,7 +2,7 @@
 from web3 import Web3
 import os
 import time
-from telegram import Bot
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from web3.middleware import geth_poa_middleware
 
 # Env variables
@@ -41,7 +41,16 @@ def monitor_new_moonshot_tokens():
                             except:
                                 token_symbol = "???"
                             print(f"🚀 New Moonshot token: {token_addr} from TX {tx['hash'].hex()}")
-                            bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f"🚀 New token found!\n• Ticker: {token_symbol}\n• CA: {token_addr}\n• 🔗 DS: https://dexscreener.com/abstract/{token_addr}\n\n✅ Buy on Looter → @looter_ai_bot {token_addr}")
+
+                            url = f"https://t.me/looter_ai_bot?start={token_addr}"
+                            keyboard = [[InlineKeyboardButton("✅ Buy on Looter", url=url)]]
+                            reply_markup = InlineKeyboardMarkup(keyboard)
+
+                            bot.send_message(
+                                chat_id=TELEGRAM_CHAT_ID,
+                                text=f"🚀 New token found!\n• Ticker: {token_symbol}\n• CA: {token_addr}\n• 🔗 DS: https://dexscreener.com/abstract/{token_addr}",
+                                reply_markup=reply_markup
+                            )
         LAST_BLOCK = latest
         time.sleep(POLL_INTERVAL)
 
