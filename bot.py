@@ -26,6 +26,7 @@ if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID or not RPC_URL:
     exit(1)
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
+bot.send_message(chat_id=TELEGRAM_CHAT_ID, text="✅ Moonshot bot is active and watching for new tokens.")
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 # Apply checksum safely
