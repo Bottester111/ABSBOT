@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(m
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 RPC_URL = os.getenv("INFURA_URL")
-FACTORY_RAW = "0x59fc79d625380f803a1fc5028fc3dc7c8b3c3f1e"  # lowercase, will be checksummed
+FACTORY_RAW = "0x0D6848e39114abE69054407452b8aaB82f8a44BA"  # lowercase, will be checksummed
 POLL_INTERVAL = 3
 
 # Output for debug
