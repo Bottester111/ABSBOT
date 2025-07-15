@@ -1,9 +1,10 @@
 
-from web3 import Web3
 import os
 import time
+from web3 import Web3
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from web3.middleware import geth_poa_middleware
+from eth_abi import decode_single
 
 # Env variables
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -16,11 +17,36 @@ bot = Bot(token=TELEGRAM_BOT_TOKEN)
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
-# Send startup confirmation
 bot.send_message(chat_id=TELEGRAM_CHAT_ID, text="✅ Moonshot bot is active and watching for new tokens.")
 
 FACTORY_ADDRESS = Web3.to_checksum_address(FACTORY_RAW)
 LAST_BLOCK = w3.eth.block_number
+
+def get_token_symbol(token_addr):
+    symbol_abi = [{
+        "constant": True,
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [{"name": "", "type": "string"}],
+        "payable": False,
+        "stateMutability": "view",
+        "type": "function"
+    }]
+    try:
+        contract = w3.eth.contract(address=token_addr, abi=symbol_abi)
+        return contract.functions.symbol().call()
+    except:
+        try:
+            raw = w3.eth.call({
+                "to": token_addr,
+                "data": "0x95d89b41"  # symbol()
+            })
+            try:
+                return decode_single("string", raw)
+            except:
+                return decode_single("bytes32", raw).decode("utf-8").rstrip("\x00")
+        except:
+            return "???"
 
 def monitor_new_moonshot_tokens():
     global LAST_BLOCK
@@ -35,36 +61,9 @@ def monitor_new_moonshot_tokens():
                     for log in receipt['logs']:
                         if log['address'].lower() == FACTORY_ADDRESS.lower() and log['topics'][0].hex() == "0x9b7f29228c2bdf9201f5a9ef2e3f3e976a30d9bd1720f7d0d63b472dcc675310":
                             token_addr = '0x' + log['data'].hex()[26:66]
+                            token_symbol = get_token_symbol(token_addr)
 
-                            # Try to get token symbol using both string and bytes32 fallback
-                            try:
-                                token_contract = w3.eth.contract(address=token_addr, abi=[{
-                                    "constant": True,
-                                    "inputs": [],
-                                    "name": "symbol",
-                                    "outputs": [{"name": "", "type": "string"}],
-                                    "payable": False,
-                                    "stateMutability": "view",
-                                    "type": "function"
-                                }])
-                                token_symbol = token_contract.functions.symbol().call()
-                            except:
-                                try:
-                                    token_contract = w3.eth.contract(address=token_addr, abi=[{
-                                        "constant": True,
-                                        "inputs": [],
-                                        "name": "symbol",
-                                        "outputs": [{"name": "", "type": "bytes32"}],
-                                        "payable": False,
-                                        "stateMutability": "view",
-                                        "type": "function"
-                                    }])
-                                    raw_symbol = token_contract.functions.symbol().call()
-                                    token_symbol = raw_symbol.decode("utf-8").rstrip("\x00")
-                                except:
-                                    token_symbol = "???"
-
-                            print(f"🚀 New Moonshot token: {token_addr} from TX {tx['hash'].hex()}")
+                            print(f"🚀 New Moonshot token: {token_addr} | Symbol: {token_symbol}")
 
                             url = f"https://t.me/looter_ai_bot?start={token_addr}"
                             keyboard = [[InlineKeyboardButton("✅ Buy on Looter", url=url)]]
