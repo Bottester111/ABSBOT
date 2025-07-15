@@ -35,11 +35,35 @@ def monitor_new_moonshot_tokens():
                     for log in receipt['logs']:
                         if log['address'].lower() == FACTORY_ADDRESS.lower() and log['topics'][0].hex() == "0x9b7f29228c2bdf9201f5a9ef2e3f3e976a30d9bd1720f7d0d63b472dcc675310":
                             token_addr = '0x' + log['data'].hex()[26:66]
+
+                            # Try to get token symbol using both string and bytes32 fallback
                             try:
-                                token_contract = w3.eth.contract(address=token_addr, abi=[{"constant":True,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":False,"stateMutability":"view","type":"function"}])
+                                token_contract = w3.eth.contract(address=token_addr, abi=[{
+                                    "constant": True,
+                                    "inputs": [],
+                                    "name": "symbol",
+                                    "outputs": [{"name": "", "type": "string"}],
+                                    "payable": False,
+                                    "stateMutability": "view",
+                                    "type": "function"
+                                }])
                                 token_symbol = token_contract.functions.symbol().call()
                             except:
-                                token_symbol = "???"
+                                try:
+                                    token_contract = w3.eth.contract(address=token_addr, abi=[{
+                                        "constant": True,
+                                        "inputs": [],
+                                        "name": "symbol",
+                                        "outputs": [{"name": "", "type": "bytes32"}],
+                                        "payable": False,
+                                        "stateMutability": "view",
+                                        "type": "function"
+                                    }])
+                                    raw_symbol = token_contract.functions.symbol().call()
+                                    token_symbol = raw_symbol.decode("utf-8").rstrip("\x00")
+                                except:
+                                    token_symbol = "???"
+
                             print(f"🚀 New Moonshot token: {token_addr} from TX {tx['hash'].hex()}")
 
                             url = f"https://t.me/looter_ai_bot?start={token_addr}"
