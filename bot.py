@@ -8,7 +8,7 @@ from eth_utils import to_checksum_address
 
 # Load environment variables
 RPC_URL = os.getenv("RPC_URL")
-FACTORY_ADDRESS = Web3.to_checksum_address(os.getenv("FACTORY_ADDRESS"))
+FACTORY_ADDRESS = Web3.to_checksum_address(os.getenv("FACTORY_ADDRESS") or "0x0D6848e39114abE69054407452b8aaB82f8a44BA")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
