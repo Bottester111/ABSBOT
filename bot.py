@@ -69,7 +69,8 @@ async def scan():
                 if parsed:
                     amount, token_address, price = parsed
                     message = (
-                        f"🚀 *New token found!*
+                        f"""🚀 *New token found!*
+"""
 "
                         f"💰 Buy Amount: {amount / 1e18:.4f} ETH
 "
