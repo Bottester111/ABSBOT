@@ -86,15 +86,10 @@ def monitor_new_moonshot_tokens():
                 token_addr = to_checksum_address("0x" + log["data"][26:66].hex())
                 symbol = get_token_symbol(token_addr)
 
-                msg = (
-                    f"🚀 *New token found!*
-"
-                    f"• Ticker: {symbol}
-"
-                    f"• CA: {token_addr}
-"
-                    f"• 🔗 DS: https://dexscreener.com/abstract/{token_addr}"
-                )
+                msg = f"""🚀 *New token found!*
+• Ticker: {symbol}
+• CA: {token_addr}
+• 🔗 DS: https://dexscreener.com/abstract/{token_addr}"""
 
                 looter_url = f"https://t.me/looter_ai_bot?start={token_addr}"
                 send_telegram_message(msg, inline_url=looter_url, button_label="✅ Buy on Looter")
