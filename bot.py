@@ -2,11 +2,6 @@ import os
 import time
 import json
 import requests
-
-def to_hex(value: bytes) -> str:
-    hex_str = value.hex()
-    return hex_str if hex_str.startswith("0x") else "0x" + hex_str
-
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 from eth_utils import to_checksum_address
