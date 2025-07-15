@@ -68,13 +68,7 @@ async def scan():
                 parsed = parse_event_data(event)
                 if parsed:
                     amount, token_address, price = parsed
-                    message = (
-                        f"""🚀 *New token found!*
-"""
-"
-                        f"💰 Buy Amount: {amount / 1e18:.4f} ETH
-"
-                        f"🔗 Token: [{token_address}](https://dexscreener.com/ethereum/{token_address})
+                    message = f"""🚀 *New token found!*\n💰 Buy Amount: {amount / 1e18:.4f} ETH\n🔗 Token: [{token_address}](https://dexscreener.com/ethereum/{token_address})\n💸 Price: {price / 1e18:.6f} ETH"""
 "
                         f"💸 Price: {price / 1e18:.6f} ETH"
                     )
